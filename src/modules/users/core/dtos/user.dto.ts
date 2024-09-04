@@ -29,12 +29,14 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto {
+  @IsOptional()
   @MinLength(3)
   name: string;
 
   @IsEmail()
   email: string;
 
+  @IsOptional()
   @IsStrongPassword(
     {},
     {
