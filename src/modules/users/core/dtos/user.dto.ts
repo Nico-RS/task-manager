@@ -31,10 +31,11 @@ export class CreateUserDto {
 export class UpdateUserDto {
   @IsOptional()
   @MinLength(3)
-  name: string;
+  name?: string;
 
+  @IsOptional()
   @IsEmail()
-  email: string;
+  email?: string;
 
   @IsOptional()
   @IsStrongPassword(
@@ -44,5 +45,5 @@ export class UpdateUserDto {
         'The password must be at least 8 characters long, including one uppercase letter, one lowercase letter, one number, and one special character',
     },
   )
-  password: string;
+  password?: string;
 }

@@ -1,11 +1,12 @@
 START TRANSACTION;
   DROP TABLE IF EXISTS `Task`;
   CREATE TABLE IF NOT EXISTS `Task` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `id` INT NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(255) NOT NULL,
     `description` TEXT NOT NULL,
     `status` ENUM('OPEN', 'IN_PROGRESS', 'DONE') DEFAULT 'OPEN' NOT NULL,
-    `assignedUserId` INT,
-    CONSTRAINT `FK_assignedUser` FOREIGN KEY (`assignedUserId`) REFERENCES `User`(`id`) ON DELETE SET NULL
+    `assignedUser` INT NOT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`assignedUser`) REFERENCES User(`id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 COMMIT;

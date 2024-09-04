@@ -20,9 +20,9 @@ export class UserController {
     return this.userService.getAllUsers();
   }
 
-  @Get(':id')
-  getUserById(@Param('id') id: string): Promise<User> {
-    return this.userService.getUserById(id);
+  @Get(':userId')
+  getUserById(@Param('userId') userId: number): Promise<User> {
+    return this.userService.getUserById(userId);
   }
 
   @Post()
@@ -30,13 +30,16 @@ export class UserController {
     return this.userService.createUser(userData);
   }
 
-  @Patch()
-  updateUser(@Body() updateUserData: UpdateUserDto): Promise<Partial<User>> {
-    return this.userService.updateUser(updateUserData);
+  @Patch(':userId')
+  updateUser(
+    @Body() updateUserData: UpdateUserDto,
+    @Param('userId') userId: number,
+  ): Promise<Partial<User>> {
+    return this.userService.updateUser(userId, updateUserData);
   }
 
-  @Delete(':id')
-  deleteUser(@Param('id') id: string): Promise<boolean> {
-    return this.userService.deleteUser(id);
+  @Delete(':userId')
+  deleteUser(@Param('userId') userId: number): Promise<boolean> {
+    return this.userService.deleteUser(userId);
   }
 }

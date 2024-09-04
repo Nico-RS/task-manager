@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { UserController } from './infrastructure/controllers/user.controller';
 import { UserService } from './core/services/user.service';
 import { UserRepository } from './infrastructure/reporitories/user.repository';
@@ -10,13 +9,9 @@ const services = [UserService];
 const interfaces = [{ provide: 'IUserRepository', useClass: UserRepository }];
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([User])],
   controllers: [UserController],
   providers: [...services, ...interfaces],
+  exports: [UserService],
 })
 export class UserModule {}

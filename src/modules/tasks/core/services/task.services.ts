@@ -1,25 +1,95 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTaskDto } from '../../dtos/task.dto';
+import { Task } from '../entities/task.entity';
+import { UserService } from 'src/modules/users/core/services/user.service';
+import { ITaskRepository } from '../repositories';
 
 @Injectable()
 export class TaskService {
-  getAllTasks(): string {
-    return 'All tasks';
+  constructor(
+    @Inject('ITaskRepository')
+    private readonly taskRepository: ITaskRepository,
+    private readonly userService: UserService,
+  ) {}
+
+  async getAllTasks(): Promise<Task[]> {
+    try {
+      return await this.taskRepository.getAllTasks();
+    } catch (error) {
+      Logger.error(error);
+      throw new InternalServerErrorException('Error getting tasks');
+    }
   }
 
-  getTaskById(id: string): string {
-    return `Task by id ${id}`;
+  async getTaskById(taskId: number): Promise<Task> {
+    try {
+      return await this.taskRepository.getTaskById(taskId);
+    } catch (error) {
+      Logger.error(error);
+      throw new InternalServerErrorException(
+        `Error getting task with id: ${taskId}`,
+      );
+    }
   }
 
-  createTask(taskData: CreateTaskDto): CreateTaskDto {
-    return taskData;
+  async getTaskByUserId(userId: number): Promise<Task[]> {
+    try {
+      return await this.taskRepository.getTaskByUserId(userId);
+    } catch (error) {
+      Logger.error(error);
+      throw new InternalServerErrorException(
+        `Error getting tasks for user with id: ${userId}`,
+      );
+    }
   }
 
-  updateTask(updateTaskData): string {
-    return `Update task with data: ${updateTaskData}`;
+  async createTask(taskData: CreateTaskDto): Promise<Task> {
+    try {
+      await this.validateUser(taskData.assignedUser);
+
+      return this.taskRepository.createTask(taskData);
+    } catch (error) {
+      Logger.error(error);
+      throw new InternalServerErrorException('Error creating task');
+    }
   }
 
-  deleteTask(id): string {
-    return `Delete task with id: ${id}`;
+  async updateTask(
+    taskId: number,
+    updateTaskData: Partial<Task>,
+  ): Promise<Task> {
+    const task = await this.taskRepository.getTaskById(taskId);
+    if (!task) throw new NotFoundException(`Task with id: ${taskId} not found`);
+    if (updateTaskData.assignedUser)
+      await this.validateUser(updateTaskData.assignedUser);
+
+    try {
+      return await this.taskRepository.updateTask(taskId, updateTaskData);
+    } catch (error) {
+      Logger.error(error);
+      throw new InternalServerErrorException('Error updating task');
+    }
+  }
+
+  async deleteTask(taskId: number): Promise<boolean> {
+    try {
+      return await this.taskRepository.deleteTask(taskId);
+    } catch (error) {
+      Logger.error(error);
+      throw new InternalServerErrorException(
+        `Error deleting task with id: ${taskId}`,
+      );
+    }
+  }
+
+  private async validateUser(userId: number): Promise<void> {
+    const user = await this.userService.getUserById(userId);
+    if (!user) throw new NotFoundException(`User with id: ${userId} not found`);
   }
 }

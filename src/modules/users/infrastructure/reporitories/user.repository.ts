@@ -16,11 +16,11 @@ export class UserRepository implements IUserRepository {
       .getMany();
   }
 
-  async getUserById(id: string): Promise<User> {
+  async getUserById(userId: number): Promise<User> {
     return this.entityManager
       .getRepository(User)
       .createQueryBuilder()
-      .where('id = :id', { id })
+      .where('id = :userId', { userId })
       .getOne();
   }
 
@@ -36,28 +36,28 @@ export class UserRepository implements IUserRepository {
     return this.entityManager.getRepository(User).save(user);
   }
 
-  async updateUser(id: string, user: Partial<User>): Promise<User> {
+  async updateUser(userId: number, user: Partial<User>): Promise<User> {
     await this.entityManager
       .getRepository(User)
       .createQueryBuilder()
       .update()
       .set(user)
-      .where('id = :id', { id })
+      .where('id = :userId', { userId })
       .execute();
 
     return this.entityManager
       .getRepository(User)
       .createQueryBuilder('user')
-      .where('user.id = :id', { id })
+      .where('user.id = :userId', { userId })
       .getOne();
   }
 
-  async deleteUser(id: string): Promise<boolean> {
+  async deleteUser(userId: number): Promise<boolean> {
     const result = await this.entityManager
       .getRepository(User)
       .createQueryBuilder()
       .delete()
-      .where('id = :id', { id })
+      .where('id = :userId', { userId })
       .execute();
 
     return result.affected > 0;

@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -25,9 +26,9 @@ export class UserService {
     }
   }
 
-  async getUserById(id: string): Promise<User> {
+  async getUserById(userId: number): Promise<User> {
     try {
-      return await this.userRepository.getUserById(id);
+      return await this.userRepository.getUserById(userId);
     } catch (error) {
       Logger.error(error);
       throw new InternalServerErrorException('Error getting user');
@@ -43,34 +44,38 @@ export class UserService {
     }
   }
 
-  async createUser(user: CreateUserDto): Promise<User> {
+  async createUser(userData: CreateUserDto): Promise<User> {
     try {
-      return await this.userRepository.createUser(user);
+      return await this.userRepository.createUser(userData);
     } catch (error) {
       Logger.error(error);
-      throw new InternalServerErrorException('Error creating user');
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException('User already exists');
+      } else {
+        throw new InternalServerErrorException('Error creating user');
+      }
     }
   }
 
-  async updateUser(updateUserData: UpdateUserDto): Promise<Partial<User>> {
-    const user = await this.getUserByEmail(updateUserData.email);
+  async updateUser(
+    userId: number,
+    updateUserData: UpdateUserDto,
+  ): Promise<Partial<User>> {
+    const user = await this.getUserById(userId);
 
     if (!user) throw new NotFoundException('User not found');
 
     try {
-      return this.userRepository.updateUser(
-        user.id?.toString(),
-        updateUserData,
-      );
+      return await this.userRepository.updateUser(user.id, updateUserData);
     } catch (error) {
       Logger.error(error);
       throw new InternalServerErrorException('Error updating user');
     }
   }
 
-  async deleteUser(id: string): Promise<boolean> {
+  async deleteUser(userId: number): Promise<boolean> {
     try {
-      return await this.userRepository.deleteUser(id);
+      return await this.userRepository.deleteUser(userId);
     } catch (error) {
       Logger.error(error);
       throw new InternalServerErrorException('Error deleting user');
