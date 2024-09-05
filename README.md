@@ -22,6 +22,28 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
+# Requirements
+
+## 1. Task Management System
+- Implement a system that handles tasks, including properties like `id`, `title`, `description`, `status`, and `assignedUser`.
+- Include functionality for creating, retrieving, updating, and deleting tasks.
+- Design the system to be extensible, allowing for future features such as task dependencies or task notifications.
+
+## 2. User Management and Authorization
+- Implement basic user management with roles (e.g., Admin, User).
+- Secure the task management endpoints with role-based access control (RBAC). For instance, only **Admins** should be able to delete tasks, while **Users** can only view and update their assigned tasks.
+
+## 3. Performance Optimization (Bonus)
+- Implement caching mechanisms for frequently accessed data, such as retrieving tasks.
+- Ensure that the application can handle a large number of tasks and users efficiently, considering both read and write operations.
+
+## 4. Resilience and Error Handling (Bonus +)
+- Implement proper error handling across the application, ensuring that errors are logged and meaningful error messages are returned to the client.
+- Introduce a circuit breaker or retry mechanism for any external API calls or database queries that might fail intermittently.
+
+## 5. Testing
+- Write comprehensive unit and integration tests.
+
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
