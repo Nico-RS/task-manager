@@ -21,9 +21,11 @@ import { TaskOwnerGuard } from '../../core/guards/task-owner.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
 import { PAGINATION } from 'src/core/constants/constants';
+import { CircuitBreakerInterceptor } from 'src/core/interceptors/circuit-breaker.interceptor';
 
 @Controller('tasks')
 @UseGuards(AuthGuard, RolesGuard)
+@UseInterceptors(CircuitBreakerInterceptor)
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 

@@ -19,8 +19,10 @@ import { User } from '../../core/entities/user.entity';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { PAGINATION } from 'src/core/constants/constants';
 import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
+import { CircuitBreakerInterceptor } from 'src/core/interceptors/circuit-breaker.interceptor';
 
 @Controller('users')
+@UseInterceptors(CircuitBreakerInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
