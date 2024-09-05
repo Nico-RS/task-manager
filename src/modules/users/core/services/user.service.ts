@@ -11,6 +11,7 @@ import { CreateUserDto, UpdateUserDto, UserLoginDto } from '../dtos/user.dto';
 import { IUserRepository } from '../interfaces/repositories';
 import { User } from '../entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
 
 @Injectable()
 export class UserService {
@@ -20,9 +21,12 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(
+    page: number,
+    limit: number,
+  ): Promise<PaginationResult<User>> {
     try {
-      return await this.userRepository.getAllUsers();
+      return await this.userRepository.getAllUsers(page, limit);
     } catch (error) {
       Logger.error(error);
       throw new InternalServerErrorException('Error getting users');

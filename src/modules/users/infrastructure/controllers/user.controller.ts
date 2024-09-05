@@ -6,6 +6,8 @@ import {
   Param,
   Patch,
   Post,
+  Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from '../../core/services/user.service';
 import {
@@ -14,14 +16,21 @@ import {
   UserLoginDto,
 } from '../../core/dtos/user.dto';
 import { User } from '../../core/entities/user.entity';
+import { CacheInterceptor } from '@nestjs/cache-manager';
+import { PAGINATION } from 'src/core/constants/constants';
+import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  getAllUsers(): Promise<User[]> {
-    return this.userService.getAllUsers();
+  @UseInterceptors(CacheInterceptor)
+  getAllUsers(
+    @Query('page') page: number = PAGINATION.DEFAULT_PAGE,
+    @Query('limit') limit: number = PAGINATION.DEFAULT_LIMIT,
+  ): Promise<PaginationResult<User>> {
+    return this.userService.getAllUsers(page, limit);
   }
 
   @Get(':userId')

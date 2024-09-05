@@ -2,18 +2,25 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { ITaskRepository } from '../../core/repositories';
 import { Task } from '../../core/entities/task.entity';
+import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
 
 export class TaskRepository implements ITaskRepository {
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
-  async getAllTasks(): Promise<Task[]> {
-    return this.entityManager
+  async getAllTasks(
+    page: number,
+    limit: number,
+  ): Promise<PaginationResult<Task>> {
+    const [data, total] = await this.entityManager
       .getRepository(Task)
       .createQueryBuilder()
-      .select()
-      .getMany();
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return { data, total, page, limit };
   }
 
   async getTaskById(taskId: number): Promise<Task> {
@@ -24,12 +31,20 @@ export class TaskRepository implements ITaskRepository {
       .getOne();
   }
 
-  async getTaskByUserId(userId: number): Promise<Task[]> {
-    return this.entityManager
+  async getTaskByUserId(
+    userId: number,
+    page: number,
+    limit: number,
+  ): Promise<PaginationResult<Task>> {
+    const [data, total] = await this.entityManager
       .getRepository(Task)
-      .createQueryBuilder()
-      .where('assignedUser = :userId', { userId })
-      .getMany();
+      .createQueryBuilder('task')
+      .where('task.assignedUser = :userId', { userId })
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return { data, total, page, limit };
   }
 
   async createTask(taskData: Partial<Task>): Promise<Task> {

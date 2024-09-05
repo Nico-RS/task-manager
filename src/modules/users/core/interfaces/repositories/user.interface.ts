@@ -1,7 +1,8 @@
+import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
 import { User } from '../../entities/user.entity';
 
 export interface IUserRepository {
-  getAllUsers(): Promise<User[]>;
+  getAllUsers(page: number, limit: number): Promise<PaginationResult<User>>;
   getUserById(userId: number): Promise<User>;
   getUserByEmail(email: string): Promise<User>;
   createUser(user: Partial<User>): Promise<User>;

@@ -2,18 +2,25 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { IUserRepository } from '../../core/interfaces/repositories';
 import { User } from '../../core/entities/user.entity';
+import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
 
 export class UserRepository implements IUserRepository {
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
-  async getAllUsers(): Promise<User[]> {
-    return this.entityManager
+  async getAllUsers(
+    page: number,
+    limit: number,
+  ): Promise<PaginationResult<User>> {
+    const [data, total] = await this.entityManager
       .getRepository(User)
-      .createQueryBuilder()
-      .select()
-      .getMany();
+      .createQueryBuilder('user')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return { data, total, page, limit };
   }
 
   async getUserById(userId: number): Promise<User> {

@@ -4,19 +4,14 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
 import { TaskService } from '../services/task.services';
-import { JwtService } from '@nestjs/jwt';
 import { UserTokenDto } from '../../dtos/token.dto';
 import { Role } from 'src/modules/users/core/enum/user.enum';
+import { PAGINATION } from 'src/core/constants/constants';
 
 @Injectable()
 export class TaskOwnerGuard implements CanActivate {
-  constructor(
-    private readonly taskService: TaskService,
-    private readonly jwtService: JwtService,
-    private readonly reflector: Reflector,
-  ) {}
+  constructor(private readonly taskService: TaskService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -28,9 +23,8 @@ export class TaskOwnerGuard implements CanActivate {
     const taskId: number = parseInt(request.params.taskId);
     const assignedUser: number = parseInt(request.params.assignedUser);
 
-    if (!taskId && !assignedUser) {
+    if (!taskId && !assignedUser)
       throw new UnauthorizedException('Task ID or assigned user is missing');
-    }
 
     if (taskId) {
       const task = await this.taskService.getTaskById(taskId);
@@ -41,8 +35,13 @@ export class TaskOwnerGuard implements CanActivate {
     }
 
     if (assignedUser) {
-      const tasks = await this.taskService.getTaskByUserId(assignedUser);
-      if (!tasks || tasks.length === 0)
+      const tasks = await this.taskService.getTaskByUserId(
+        assignedUser,
+        PAGINATION.DEFAULT_PAGE,
+        Number.MAX_SAFE_INTEGER,
+      );
+
+      if (!tasks || tasks.total === 0)
         throw new UnauthorizedException('No tasks found for this user');
 
       if (assignedUser !== user.sub)

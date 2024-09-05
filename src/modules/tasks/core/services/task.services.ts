@@ -9,6 +9,7 @@ import { CreateTaskDto } from '../../dtos/task.dto';
 import { Task } from '../entities/task.entity';
 import { UserService } from 'src/modules/users/core/services/user.service';
 import { ITaskRepository } from '../repositories';
+import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
 
 @Injectable()
 export class TaskService {
@@ -18,9 +19,12 @@ export class TaskService {
     private readonly userService: UserService,
   ) {}
 
-  async getAllTasks(): Promise<Task[]> {
+  async getAllTasks(
+    page: number,
+    limit: number,
+  ): Promise<PaginationResult<Task>> {
     try {
-      return await this.taskRepository.getAllTasks();
+      return await this.taskRepository.getAllTasks(page, limit);
     } catch (error) {
       Logger.error(error);
       throw new InternalServerErrorException('Error getting tasks');
@@ -38,9 +42,13 @@ export class TaskService {
     }
   }
 
-  async getTaskByUserId(userId: number): Promise<Task[]> {
+  async getTaskByUserId(
+    userId: number,
+    page: number,
+    limit: number,
+  ): Promise<PaginationResult<Task>> {
     try {
-      return await this.taskRepository.getTaskByUserId(userId);
+      return await this.taskRepository.getTaskByUserId(userId, page, limit);
     } catch (error) {
       Logger.error(error);
       throw new InternalServerErrorException(

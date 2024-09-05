@@ -6,7 +6,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TaskService } from '../../core/services/task.services';
 import { CreateTaskDto, UpdateTaskDto } from '../../dtos/task.dto';
@@ -16,6 +18,9 @@ import { AuthGuard } from '../../core/guards/auth.guard';
 import { RolesGuard } from '../../core/guards/roles.guard';
 import { Roles } from '../../core/decorators/roles.decorator';
 import { TaskOwnerGuard } from '../../core/guards/task-owner.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
+import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
+import { PAGINATION } from 'src/core/constants/constants';
 
 @Controller('tasks')
 @UseGuards(AuthGuard, RolesGuard)
@@ -24,8 +29,12 @@ export class TaskController {
 
   @Get()
   @Roles(Role.ADMIN)
-  getAllTasks(): Promise<Task[]> {
-    return this.taskService.getAllTasks();
+  @UseInterceptors(CacheInterceptor)
+  getAllTasks(
+    @Query('page') page: number = PAGINATION.DEFAULT_PAGE,
+    @Query('limit') limit: number = PAGINATION.DEFAULT_LIMIT,
+  ): Promise<PaginationResult<Task>> {
+    return this.taskService.getAllTasks(page, limit);
   }
 
   @Get(':taskId')
@@ -38,8 +47,13 @@ export class TaskController {
   @Get('user/:assignedUser')
   @UseGuards(TaskOwnerGuard)
   @Roles(Role.USER, Role.ADMIN)
-  getTaskByUserId(@Param('assignedUser') userId: number): Promise<Task[]> {
-    return this.taskService.getTaskByUserId(userId);
+  @UseInterceptors(CacheInterceptor)
+  getTaskByUserId(
+    @Param('assignedUser') userId: number,
+    @Query('page') page: number = PAGINATION.DEFAULT_PAGE,
+    @Query('limit') limit: number = PAGINATION.DEFAULT_LIMIT,
+  ): Promise<PaginationResult<Task>> {
+    return this.taskService.getTaskByUserId(userId, page, limit);
   }
 
   @Post()
