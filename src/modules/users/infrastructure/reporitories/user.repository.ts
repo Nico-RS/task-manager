@@ -32,11 +32,13 @@ export class UserRepository implements IUserRepository {
       .getOne();
   }
 
-  async createUser(user: User): Promise<User> {
+  async createUser(userData: User): Promise<User> {
+    const user = this.entityManager.create(User, userData);
     return this.entityManager.getRepository(User).save(user);
   }
 
-  async updateUser(userId: number, user: Partial<User>): Promise<User> {
+  async updateUser(userId: number, userData: Partial<User>): Promise<User> {
+    const user = this.entityManager.create(User, userData);
     await this.entityManager
       .getRepository(User)
       .createQueryBuilder()

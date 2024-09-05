@@ -28,7 +28,7 @@ export class TaskRepository implements ITaskRepository {
     return this.entityManager
       .getRepository(Task)
       .createQueryBuilder()
-      .where('userId = :userId', { userId })
+      .where('assignedUser = :userId', { userId })
       .getMany();
   }
 

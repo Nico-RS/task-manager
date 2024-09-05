@@ -8,7 +8,7 @@ export function welcome(): void {
     ██║╚████║██╔══██╗░╚═══██╗
     ██║░╚███║██║░░██║██████╔╝
     ╚═╝░░╚══╝╚═╝░░╚═╝╚═════╝░
-  Welcome to ${process.env.X_APPLICATION_ID}`,
+    Welcome to ${process.env.X_APPLICATION_ID}`,
     '\x1b[0m',
   );
 }

@@ -8,7 +8,11 @@ import {
   Post,
 } from '@nestjs/common';
 import { UserService } from '../../core/services/user.service';
-import { CreateUserDto, UpdateUserDto } from '../../core/dtos/user.dto';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  UserLoginDto,
+} from '../../core/dtos/user.dto';
 import { User } from '../../core/entities/user.entity';
 
 @Controller('users')
@@ -41,5 +45,10 @@ export class UserController {
   @Delete(':userId')
   deleteUser(@Param('userId') userId: number): Promise<boolean> {
     return this.userService.deleteUser(userId);
+  }
+
+  @Post('login')
+  login(@Body() userData: UserLoginDto): Promise<{ token: string }> {
+    return this.userService.login(userData);
   }
 }

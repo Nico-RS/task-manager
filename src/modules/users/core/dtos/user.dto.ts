@@ -5,7 +5,7 @@ import {
   IsStrongPassword,
   MinLength,
 } from 'class-validator';
-import { UserRole } from '../enum/user.enum';
+import { Role } from '../enum/user.enum';
 
 export class CreateUserDto {
   @MinLength(3)
@@ -23,9 +23,9 @@ export class CreateUserDto {
   )
   password: string;
 
-  @IsEnum(UserRole)
+  @IsEnum(Role)
   @IsOptional()
-  role?: UserRole;
+  role?: Role;
 }
 
 export class UpdateUserDto {
@@ -46,4 +46,18 @@ export class UpdateUserDto {
     },
   )
   password?: string;
+}
+
+export class UserLoginDto {
+  @IsEmail()
+  email: string;
+
+  @IsStrongPassword(
+    {},
+    {
+      message:
+        'The password must be at least 8 characters long, including one uppercase letter, one lowercase letter, one number, and one special character',
+    },
+  )
+  password: string;
 }

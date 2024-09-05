@@ -5,6 +5,7 @@ import { HealthService } from './core/services/health.service';
 import { TaskModule } from './modules/tasks/task.module';
 import { UserModule } from './modules/users/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -23,6 +24,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: process.env.DB_SYNC === 'true',
       logging: true,
       keepConnectionAlive: true,
+    }),
+
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '60m' },
     }),
 
     TaskModule,
