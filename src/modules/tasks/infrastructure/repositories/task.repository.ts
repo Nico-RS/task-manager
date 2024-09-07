@@ -2,7 +2,7 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { ITaskRepository } from '../../core/repositories';
 import { Task } from '../../core/entities/task.entity';
-import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
+import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
 
 export class TaskRepository implements ITaskRepository {
   constructor(

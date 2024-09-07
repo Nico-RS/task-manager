@@ -13,25 +13,25 @@ import {
 import { TaskService } from '../../core/services/task.services';
 import { CreateTaskDto, UpdateTaskDto } from '../../dtos/task.dto';
 import { Task } from '../../core/entities/task.entity';
-import { Role } from 'src/modules/users/core/enum/user.enum';
+import { Role } from '../../../users/core/enums/user.enum';
 import { AuthGuard } from '../../core/guards/auth.guard';
 import { RolesGuard } from '../../core/guards/roles.guard';
 import { Roles } from '../../core/decorators/roles.decorator';
 import { TaskOwnerGuard } from '../../core/guards/task-owner.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
-import { PAGINATION } from 'src/core/constants/constants';
-import { CircuitBreakerInterceptor } from 'src/core/interceptors/circuit-breaker.interceptor';
+import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
+import { PAGINATION } from '../../../../core/constants/constants';
+import { CircuitBreakerInterceptor } from '../../../../core/interceptors/circuit-breaker.interceptor';
 
 @Controller('tasks')
 @UseGuards(AuthGuard, RolesGuard)
-@UseInterceptors(CircuitBreakerInterceptor)
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Get()
   @Roles(Role.ADMIN)
   @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(CircuitBreakerInterceptor)
   getAllTasks(
     @Query('page') page: number = PAGINATION.DEFAULT_PAGE,
     @Query('limit') limit: number = PAGINATION.DEFAULT_LIMIT,
@@ -68,8 +68,8 @@ export class TaskController {
   @UseGuards(TaskOwnerGuard)
   @Roles(Role.USER, Role.ADMIN)
   updateTask(
-    @Body() updateTaskData: UpdateTaskDto,
     @Param('taskId') taskId: number,
+    @Body() updateTaskData: UpdateTaskDto,
   ): Promise<Task> {
     return this.taskService.updateTask(taskId, updateTaskData);
   }

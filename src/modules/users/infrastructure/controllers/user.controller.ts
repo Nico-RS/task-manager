@@ -17,17 +17,17 @@ import {
 } from '../../core/dtos/user.dto';
 import { User } from '../../core/entities/user.entity';
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { PAGINATION } from 'src/core/constants/constants';
-import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
-import { CircuitBreakerInterceptor } from 'src/core/interceptors/circuit-breaker.interceptor';
+import { PAGINATION } from '../../../../core/constants/constants';
+import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
+import { CircuitBreakerInterceptor } from '../../../../core/interceptors/circuit-breaker.interceptor';
 
 @Controller('users')
-@UseInterceptors(CircuitBreakerInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
   @UseInterceptors(CacheInterceptor)
+  @UseInterceptors(CircuitBreakerInterceptor)
   getAllUsers(
     @Query('page') page: number = PAGINATION.DEFAULT_PAGE,
     @Query('limit') limit: number = PAGINATION.DEFAULT_LIMIT,
@@ -47,8 +47,8 @@ export class UserController {
 
   @Patch(':userId')
   updateUser(
-    @Body() updateUserData: UpdateUserDto,
     @Param('userId') userId: number,
+    @Body() updateUserData: UpdateUserDto,
   ): Promise<Partial<User>> {
     return this.userService.updateUser(userId, updateUserData);
   }

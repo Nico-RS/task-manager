@@ -2,7 +2,7 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { IUserRepository } from '../../core/interfaces/repositories';
 import { User } from '../../core/entities/user.entity';
-import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
+import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
 
 export class UserRepository implements IUserRepository {
   constructor(

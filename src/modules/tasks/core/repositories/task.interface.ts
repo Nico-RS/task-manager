@@ -1,4 +1,4 @@
-import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
+import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
 import { Task } from '../entities/task.entity';
 
 export interface ITaskRepository {

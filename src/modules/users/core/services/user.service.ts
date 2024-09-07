@@ -11,7 +11,7 @@ import { CreateUserDto, UpdateUserDto, UserLoginDto } from '../dtos/user.dto';
 import { IUserRepository } from '../interfaces/repositories';
 import { User } from '../entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
-import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
+import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
 
 @Injectable()
 export class UserService {
@@ -47,7 +47,7 @@ export class UserService {
       return await this.userRepository.createUser(userData);
     } catch (error) {
       Logger.error(error);
-      if (error.code.includes('ER_DUP_ENTRY')) {
+      if (error?.code?.includes('ER_DUP_ENTRY')) {
         throw new ConflictException('User already exists');
       } else {
         throw new InternalServerErrorException('Error creating user');

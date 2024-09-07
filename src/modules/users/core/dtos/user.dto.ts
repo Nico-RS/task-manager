@@ -5,7 +5,7 @@ import {
   IsStrongPassword,
   MinLength,
 } from 'class-validator';
-import { Role } from '../enum/user.enum';
+import { Role } from '../enums/user.enum';
 
 export class CreateUserDto {
   @MinLength(3)

@@ -1,13 +1,15 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { TaskService } from '../services/task.services';
 import { UserTokenDto } from '../../dtos/token.dto';
-import { Role } from 'src/modules/users/core/enum/user.enum';
-import { PAGINATION } from 'src/core/constants/constants';
+import { Role } from '../../../users/core/enums/user.enum';
+import { PAGINATION } from '../../../../core/constants/constants';
 
 @Injectable()
 export class TaskOwnerGuard implements CanActivate {
@@ -24,11 +26,11 @@ export class TaskOwnerGuard implements CanActivate {
     const assignedUser: number = parseInt(request.params.assignedUser);
 
     if (!taskId && !assignedUser)
-      throw new UnauthorizedException('Task ID or assigned user is missing');
+      throw new BadRequestException('Task ID or assigned user is missing');
 
     if (taskId) {
       const task = await this.taskService.getTaskById(taskId);
-      if (!task) throw new UnauthorizedException('Task not found');
+      if (!task) throw new NotFoundException('Task not found');
 
       if (task.assignedUser !== user.sub)
         throw new UnauthorizedException('You do not own this task');

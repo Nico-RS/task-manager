@@ -6,7 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { TaskStatus } from '../enums/task.enum';
-import { User } from 'src/modules/users/core/entities/user.entity';
+import { User } from '../../../users/core/entities/user.entity';
 
 @Entity()
 export class Task {

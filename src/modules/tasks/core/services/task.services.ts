@@ -7,9 +7,9 @@ import {
 } from '@nestjs/common';
 import { CreateTaskDto } from '../../dtos/task.dto';
 import { Task } from '../entities/task.entity';
-import { UserService } from 'src/modules/users/core/services/user.service';
+import { UserService } from '../../../users/core/services/user.service';
 import { ITaskRepository } from '../repositories';
-import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
+import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
 
 @Injectable()
 export class TaskService {
@@ -63,6 +63,9 @@ export class TaskService {
 
       return this.taskRepository.createTask(taskData);
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       Logger.error(error);
       throw new InternalServerErrorException('Error creating task');
     }

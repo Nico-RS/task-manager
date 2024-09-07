@@ -6,8 +6,8 @@ import {
   BeforeInsert,
   BeforeUpdate,
 } from 'typeorm';
-import { Role } from '../enum/user.enum';
-import { Task } from 'src/modules/tasks/core/entities/task.entity';
+import { Role } from '../enums/user.enum';
+import { Task } from '../../../tasks/core/entities/task.entity';
 import * as bcrypt from 'bcrypt';
 
 @Entity()
@@ -25,7 +25,7 @@ export class User {
   password: string;
 
   @Column({ type: 'simple-array', enum: Role, default: Role.USER })
-  roles: Role;
+  roles: Role[];
 
   @BeforeInsert()
   @BeforeUpdate()

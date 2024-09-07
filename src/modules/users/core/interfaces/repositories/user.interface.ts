@@ -1,4 +1,4 @@
-import { PaginationResult } from 'src/core/interfaces/pagination-result.interface';
+import { PaginationResult } from '../../../../../core/interfaces/pagination-result.interface';
 import { User } from '../../entities/user.entity';
 
 export interface IUserRepository {
