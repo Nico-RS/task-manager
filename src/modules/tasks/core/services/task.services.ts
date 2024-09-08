@@ -5,11 +5,11 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateTaskDto } from '../../dtos/task.dto';
 import { Task } from '../entities/task.entity';
 import { UserService } from '../../../users/core/services/user.service';
 import { ITaskRepository } from '../repositories';
 import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
+import { CreateTaskDto } from '../dtos/task.dto';
 
 @Injectable()
 export class TaskService {

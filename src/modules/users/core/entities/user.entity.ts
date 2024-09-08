@@ -24,7 +24,7 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ type: 'simple-array', enum: Role, default: Role.USER })
+  @Column({ type: 'enum', enum: Role, default: Role.USER, array: true })
   roles: Role[];
 
   @BeforeInsert()

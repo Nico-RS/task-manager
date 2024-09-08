@@ -11,7 +11,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { TaskService } from '../../core/services/task.services';
-import { CreateTaskDto, UpdateTaskDto } from '../../dtos/task.dto';
 import { Task } from '../../core/entities/task.entity';
 import { Role } from '../../../users/core/enums/user.enum';
 import { AuthGuard } from '../../core/guards/auth.guard';
@@ -22,6 +21,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
 import { PAGINATION } from '../../../../core/constants/constants';
 import { CircuitBreakerInterceptor } from '../../../../core/interceptors/circuit-breaker.interceptor';
+import { CreateTaskDto, UpdateTaskDto } from '../../core/dtos/task.dto';
 
 @Controller('tasks')
 @UseGuards(AuthGuard, RolesGuard)

@@ -15,6 +15,7 @@ bootstrap();
 const setGlobalModifiers = (appModule: INestApplication) => {
   appModule.useGlobalPipes(
     new ValidationPipe({
+      whitelist: true,
       forbidNonWhitelisted: true,
     }),
   );

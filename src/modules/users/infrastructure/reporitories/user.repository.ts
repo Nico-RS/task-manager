@@ -16,6 +16,7 @@ export class UserRepository implements IUserRepository {
     const [data, total] = await this.entityManager
       .getRepository(User)
       .createQueryBuilder('user')
+      .select(['user.id', 'user.name', 'user.email', 'user.roles'])
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -26,8 +27,9 @@ export class UserRepository implements IUserRepository {
   async getUserById(userId: number): Promise<User> {
     return this.entityManager
       .getRepository(User)
-      .createQueryBuilder()
-      .where('id = :userId', { userId })
+      .createQueryBuilder('user')
+      .select(['user.id', 'user.name', 'user.email', 'user.roles']) // Excluir el campo 'password'
+      .where('user.id = :userId', { userId })
       .getOne();
   }
 
@@ -45,18 +47,20 @@ export class UserRepository implements IUserRepository {
   }
 
   async updateUser(userId: number, userData: Partial<User>): Promise<User> {
-    const user = this.entityManager.create(User, userData);
-    await this.entityManager
-      .getRepository(User)
-      .createQueryBuilder()
-      .update()
-      .set(user)
-      .where('id = :userId', { userId })
-      .execute();
+    const existingUser = await this.entityManager.getRepository(User).findOne({
+      where: { id: userId },
+    });
+
+    if (!existingUser) throw new Error('User not found');
+
+    Object.assign(existingUser, userData);
+
+    await this.entityManager.getRepository(User).save(existingUser);
 
     return this.entityManager
       .getRepository(User)
       .createQueryBuilder('user')
+      .select(['user.id', 'user.name', 'user.email', 'user.roles'])
       .where('user.id = :userId', { userId })
       .getOne();
   }

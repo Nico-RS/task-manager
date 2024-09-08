@@ -7,9 +7,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { TaskService } from '../services/task.services';
-import { UserTokenDto } from '../../dtos/token.dto';
 import { Role } from '../../../users/core/enums/user.enum';
 import { PAGINATION } from '../../../../core/constants/constants';
+import { UserTokenDto } from '../dtos/token.dto';
 
 @Injectable()
 export class TaskOwnerGuard implements CanActivate {

@@ -6,12 +6,14 @@ import {
   MinLength,
 } from 'class-validator';
 import { Role } from '../enums/user.enum';
+import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
   @MinLength(3)
   name: string;
 
   @IsEmail()
+  @Transform(({ value }) => value.toLowerCase())
   email: string;
 
   @IsStrongPassword(
@@ -23,9 +25,9 @@ export class CreateUserDto {
   )
   password: string;
 
-  @IsEnum(Role)
+  @IsEnum(Role, { each: true })
   @IsOptional()
-  role?: Role;
+  roles?: Role[];
 }
 
 export class UpdateUserDto {
