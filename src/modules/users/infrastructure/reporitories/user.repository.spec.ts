@@ -3,6 +3,7 @@ import { UserRepository } from './user.repository';
 import { EntityManager } from 'typeorm';
 import { User } from '../../core/entities/user.entity';
 import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
+import { Role } from '../../core/enums/user.enum';
 
 describe('UserRepository', () => {
   let userRepository: UserRepository;
@@ -15,13 +16,13 @@ describe('UserRepository', () => {
     take: jest.fn().mockReturnThis(),
     getManyAndCount: jest.fn(),
     where: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
     getOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
-    update: jest.fn().mockReturnThis(),
-    set: jest.fn().mockReturnThis(),
-    execute: jest.fn(),
+    findOne: jest.fn(),
     delete: jest.fn().mockReturnThis(),
+    execute: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -34,6 +35,10 @@ describe('UserRepository', () => {
 
     userRepository = module.get<UserRepository>(UserRepository);
     entityManager = module.get<EntityManager>(EntityManager);
+  });
+
+  it('should be defined', () => {
+    expect(userRepository).toBeDefined();
   });
 
   describe('getAllUsers', () => {
@@ -65,10 +70,38 @@ describe('UserRepository', () => {
 
       expect(result).toBe(user);
       expect(mockEntityManager.getRepository).toHaveBeenCalledWith(User);
-      expect(mockEntityManager.createQueryBuilder).toHaveBeenCalled();
-      expect(mockEntityManager.where).toHaveBeenCalledWith('id = :userId', {
-        userId: 1,
-      });
+      expect(mockEntityManager.createQueryBuilder).toHaveBeenCalledWith('user');
+      expect(mockEntityManager.where).toHaveBeenCalledWith(
+        'user.id = :userId',
+        { userId: 1 },
+      );
+      expect(mockEntityManager.select).toHaveBeenCalledWith([
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.roles',
+      ]);
+      expect(mockEntityManager.getOne).toHaveBeenCalled();
+    });
+
+    it('should return null if user not found', async () => {
+      mockEntityManager.getOne.mockResolvedValue(null);
+
+      const result = await userRepository.getUserById(1);
+
+      expect(result).toBeNull();
+      expect(mockEntityManager.getRepository).toHaveBeenCalledWith(User);
+      expect(mockEntityManager.createQueryBuilder).toHaveBeenCalledWith('user');
+      expect(mockEntityManager.where).toHaveBeenCalledWith(
+        'user.id = :userId',
+        { userId: 1 },
+      );
+      expect(mockEntityManager.select).toHaveBeenCalledWith([
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.roles',
+      ]);
       expect(mockEntityManager.getOne).toHaveBeenCalled();
     });
   });
@@ -81,6 +114,20 @@ describe('UserRepository', () => {
       const result = await userRepository.getUserByEmail('test@example.com');
 
       expect(result).toBe(user);
+      expect(mockEntityManager.getRepository).toHaveBeenCalledWith(User);
+      expect(mockEntityManager.createQueryBuilder).toHaveBeenCalled();
+      expect(mockEntityManager.where).toHaveBeenCalledWith('email = :email', {
+        email: 'test@example.com',
+      });
+      expect(mockEntityManager.getOne).toHaveBeenCalled();
+    });
+
+    it('should return null if user not found', async () => {
+      mockEntityManager.getOne.mockResolvedValue(null);
+
+      const result = await userRepository.getUserByEmail('test@example.com');
+
+      expect(result).toBeNull();
       expect(mockEntityManager.getRepository).toHaveBeenCalledWith(User);
       expect(mockEntityManager.createQueryBuilder).toHaveBeenCalled();
       expect(mockEntityManager.where).toHaveBeenCalledWith('email = :email', {
@@ -107,21 +154,54 @@ describe('UserRepository', () => {
   describe('updateUser', () => {
     it('should update and return the updated user', async () => {
       const user = new User();
-      mockEntityManager.create.mockReturnValue(user);
-      mockEntityManager.execute.mockResolvedValue({ affected: 1 });
-      mockEntityManager.getOne.mockResolvedValue(user);
+      user.id = 1;
+      user.name = 'Original Name';
+      user.email = 'original@example.com';
+      user.roles = [Role.ADMIN];
 
-      const result = await userRepository.updateUser(1, user);
+      const updatedUser = { ...user, name: 'Updated Name' };
 
-      expect(result).toBe(user);
-      expect(mockEntityManager.create).toHaveBeenCalledWith(User, user);
-      expect(mockEntityManager.update).toHaveBeenCalled();
-      expect(mockEntityManager.set).toHaveBeenCalledWith(user);
-      expect(mockEntityManager.where).toHaveBeenCalledWith('id = :userId', {
-        userId: 1,
+      mockEntityManager.findOne.mockResolvedValue(user);
+      mockEntityManager.save.mockResolvedValue(updatedUser);
+      mockEntityManager.createQueryBuilder.mockReturnThis();
+      mockEntityManager.select.mockReturnThis();
+      mockEntityManager.where.mockReturnThis();
+      mockEntityManager.getOne.mockResolvedValue(updatedUser);
+
+      const result = await userRepository.updateUser(1, {
+        name: 'Updated Name',
       });
-      expect(mockEntityManager.execute).toHaveBeenCalled();
-      expect(mockEntityManager.getOne).toHaveBeenCalledWith();
+
+      expect(result).toBe(updatedUser);
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
+      expect(mockEntityManager.save).toHaveBeenCalledWith(updatedUser);
+      expect(mockEntityManager.createQueryBuilder).toHaveBeenCalledWith('user');
+      expect(mockEntityManager.select).toHaveBeenCalledWith([
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.roles',
+      ]);
+      expect(mockEntityManager.where).toHaveBeenCalledWith(
+        'user.id = :userId',
+        {
+          userId: 1,
+        },
+      );
+      expect(mockEntityManager.getOne).toHaveBeenCalled();
+    });
+
+    it('should throw an error if user not found', async () => {
+      mockEntityManager.findOne.mockResolvedValue(null);
+
+      await expect(
+        userRepository.updateUser(1, { name: 'Updated Name' }),
+      ).rejects.toThrow('User not found');
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
     });
   });
 

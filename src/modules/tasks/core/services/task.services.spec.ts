@@ -2,7 +2,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ITaskRepository } from '../repositories';
 import { UserService } from '../../../users/core/services/user.service';
-import { CreateTaskDto } from '../../dtos/task.dto';
 import { Task } from '../entities/task.entity';
 import {
   NotFoundException,
@@ -10,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
 import { TaskService } from './task.services';
+import { CreateTaskDto } from '../dtos/task.dto';
 
 describe('TaskService', () => {
   let taskService: TaskService;
