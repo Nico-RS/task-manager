@@ -76,7 +76,7 @@ export class TaskController {
 
   @Delete(':taskId')
   @Roles(Role.ADMIN)
-  deleteTask(@Param() taskId): Promise<boolean> {
+  deleteTask(@Param('taskId') taskId: number): Promise<boolean> {
     return this.taskService.deleteTask(taskId);
   }
 }
