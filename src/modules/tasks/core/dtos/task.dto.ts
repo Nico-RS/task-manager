@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, Length } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, Length } from 'class-validator';
 import { TaskStatus } from '../enums/task.enum';
 
 export class CreateTaskDto {
@@ -26,4 +26,9 @@ export class UpdateTaskDto {
   @IsOptional()
   @IsNumber()
   assignedUser?: number;
+}
+
+export class ManageStatusDto {
+  @IsBoolean()
+  status: boolean;
 }

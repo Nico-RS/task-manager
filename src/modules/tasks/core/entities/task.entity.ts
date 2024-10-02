@@ -19,6 +19,12 @@ export class Task {
   @Column()
   description: string;
 
+  @Column()
+  aprovedStatus: string;
+
+  @Column()
+  algo: Date;
+
   @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.OPEN })
   status: TaskStatus;
 

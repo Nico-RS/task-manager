@@ -9,13 +9,16 @@ import { Task } from '../entities/task.entity';
 import { UserService } from '../../../users/core/services/user.service';
 import { ITaskRepository } from '../repositories';
 import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
-import { CreateTaskDto } from '../dtos/task.dto';
+import { CreateTaskDto, ManageStatusDto } from '../dtos/task.dto';
+import { ITwilioNotificator } from '../notificators/twilio.notificator';
 
 @Injectable()
 export class TaskService {
   constructor(
     @Inject('ITaskRepository')
     private readonly taskRepository: ITaskRepository,
+    @Inject('ITwilioNotificator')
+    private readonly twilioNotificator: ITwilioNotificator,
     private readonly userService: UserService,
   ) {}
 
@@ -96,6 +99,25 @@ export class TaskService {
       throw new InternalServerErrorException(
         `Error deleting task with id: ${taskId}`,
       );
+    }
+  }
+
+  async manageTask(
+    taskId: number,
+    taskAprovedStatus: ManageStatusDto,
+  ): Promise<Task> {
+    const task = await this.taskRepository.getTaskById(taskId);
+    if (!task) throw new NotFoundException(`Task with id: ${taskId} not found`);
+
+    task.aprovedStatus = taskAprovedStatus.status ? 'Aproved' : 'Rejected';
+
+    this.twilioNotificator.sendSMS(task.aprovedStatus);
+
+    try {
+      return await this.taskRepository.updateTask(taskId, task);
+    } catch (error) {
+      Logger.error(error);
+      throw new InternalServerErrorException('Error managing task');
     }
   }
 

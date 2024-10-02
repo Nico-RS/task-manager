@@ -21,7 +21,11 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 import { PaginationResult } from '../../../../core/interfaces/pagination-result.interface';
 import { PAGINATION } from '../../../../core/constants/constants';
 import { CircuitBreakerInterceptor } from '../../../../core/interceptors/circuit-breaker.interceptor';
-import { CreateTaskDto, UpdateTaskDto } from '../../core/dtos/task.dto';
+import {
+  CreateTaskDto,
+  ManageStatusDto,
+  UpdateTaskDto,
+} from '../../core/dtos/task.dto';
 
 @Controller('tasks')
 @UseGuards(AuthGuard, RolesGuard)
@@ -59,7 +63,7 @@ export class TaskController {
   }
 
   @Post()
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   createTask(@Body() taskData: CreateTaskDto): Promise<Task> {
     return this.taskService.createTask(taskData);
   }
@@ -78,5 +82,14 @@ export class TaskController {
   @Roles(Role.ADMIN)
   deleteTask(@Param('taskId') taskId: number): Promise<boolean> {
     return this.taskService.deleteTask(taskId);
+  }
+
+  @Post('/manage-task/:taskId')
+  @Roles(Role.ADMIN)
+  manageTask(
+    @Param('taskId') taskId: number,
+    @Body() taskAprovedStatus: ManageStatusDto,
+  ): Promise<Task> {
+    return this.taskService.manageTask(taskId, taskAprovedStatus);
   }
 }
